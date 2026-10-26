@@ -1,0 +1,133 @@
+{
+  "name": "barkod-siralama",
+  "productName": "TAARKOD",
+  "version": "1.8.0",
+  "description": "TAARKOD masaüstü uygulaması",
+  "author": "TAARKOD",
+  "homepage": "https://taarkod.invalid/",
+  "license": "UNLICENSED",
+  "private": true,
+  "main": "main.js",
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "kopyala": "node scripts/kopyala.js",
+    "start": "npm run kopyala && electron .",
+    "dist": "npm run dist:win",
+    "dist:dir": "npm run kopyala && electron-builder --win --x64 --dir --publish never",
+    "dist:win": "npm run kopyala && electron-builder --win --x64 --publish never",
+    "dist:linux": "npm run kopyala && electron-builder --linux AppImage deb --x64 --publish never",
+    "dist:mac": "npm run kopyala && electron-builder --mac zip dmg --x64 --arm64 --publish never",
+    "ikon:icns": "node scripts/icns.js"
+  },
+  "devDependencies": {
+    "electron": "43.7.6",
+    "electron-builder": "26.15.3",
+    "png2icons": "2.0.1",
+    "resedit": "3.0.2"
+  },
+  "build": {
+    "appId": "com.barkodsiralama.app",
+    "productName": "TAARKOD",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "main.js",
+      "temizlik.js",
+      "ayarkopya.js",
+      "pencere.js",
+      "preload.js",
+      "app/index.html",
+      "build/icon.png",
+      "package.json"
+    ],
+    "asar": true,
+    "publish": null,
+    "icon": "build/icon.png",
+    "afterPack": "build/afterpack.js",
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build/icon.ico",
+      "signAndEditExecutable": false
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowElevation": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "deleteAppDataOnUninstall": false,
+      "installerLanguages": [
+        "tr_TR"
+      ],
+      "language": "1055",
+      "installerIcon": "build/icon.ico",
+      "uninstallerIcon": "build/icon.ico",
+      "installerHeaderIcon": "build/icon.ico",
+      "artifactName": "TAARKOD-Kurulum-${version}.exe"
+    },
+    "portable": {
+      "artifactName": "TAARKOD-Tasinabilir-${version}.exe"
+    },
+    "linux": {
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "deb",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "category": "Utility",
+      "icon": "build/icon.png",
+      "artifactName": "TAARKOD-${version}-linux-x64.${ext}",
+      "maintainer": "TAARKOD <noreply@taarkod.invalid>"
+    },
+    "deb": {
+      "packageCategory": "utils"
+    },
+    "mac": {
+      "target": [
+        {
+          "target": "zip",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        },
+        {
+          "target": "dmg",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
+      ],
+      "category": "public.app-category.productivity",
+      "icon": "build/icon.icns",
+      "identity": null,
+      "artifactName": "TAARKOD-${version}-mac-${arch}.${ext}"
+    }
+  }
+}

@@ -1,0 +1,52 @@
+name: build
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            betik: dist:win
+            ad: windows
+          - os: ubuntu-latest
+            betik: dist:linux
+            ad: linux
+          - os: macos-latest
+            betik: dist:mac
+            ad: macos
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        working-directory: masaustu
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: masaustu/package-lock.json
+      - run: npm ci
+      - run: npm test
+      # İmzasız derleme: sertifika/gizli anahtar kullanılmaz.
+      - run: npm run ${{ matrix.betik }}
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: taarkod-${{ matrix.ad }}
+          path: |
+            masaustu/dist/*.exe
+            masaustu/dist/*.AppImage
+            masaustu/dist/*.deb
+            masaustu/dist/*.zip
+            masaustu/dist/*.dmg
+          if-no-files-found: error
