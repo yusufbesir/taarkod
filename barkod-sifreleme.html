@@ -95,6 +95,11 @@ html[data-masaustu] .temaKap{flex:none}
 .icerik:focus{outline:none}
 .bolum{margin:0 0 28px}
 .panel>.bolum+.bolum{border-top:1px solid var(--cizgi);padding-top:24px}
+/* Geçiş hareketi (kısa, sakin): panel girişi, sekme çizgisi, çekmece. Dosya sonundaki hareket azaltma kuralı hepsini kapatır; Görünüm penceresi (#gorunum) hareketsiz kalır. */
+@keyframes panelGir{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.panel:not([hidden]){animation:panelGir .22s cubic-bezier(.2,.7,.3,1)}
+.sekmeIc button{transition:color .18s ease,border-bottom-color .18s ease,background-color .18s ease}
+.cekmece:not([hidden]){animation:panelGir .16s ease-out}
 #kelimeKart{padding-bottom:22px;border-bottom:1px solid var(--cizgi);margin-bottom:26px}
 
 /* form */
