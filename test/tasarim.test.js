@@ -108,9 +108,10 @@ test('tipografi: sistem yazı tipi yığını (serif/mono yığın adı; gömül
   assert.doesNotMatch(css, /font-family:[^;}]*(Inter|Roboto Flex|Google)/);
 });
 
-test('hareket: azaltılmış hareket kuralı var, anahtar kareler/animasyon yok', () => {
+test('hareket: geçiş animasyonu serbest, ama azaltılmış hareket kuralı hepsini kapatır; Görünüm penceresinde hareket yok', () => {
+  // Yusuf 2026-11-03: sekme/panel geçişleri animasyonlu olsun. Koşul: hareket azaltma her şeyi kapatır, #gorunum hareketsiz kalır.
   assert.match(css, /@media \(prefers-reduced-motion:reduce\)\{\*\{animation:none!important;transition:none!important/);
-  assert.doesNotMatch(css, /@keyframes|animation:(?!none)/);
+  assert.doesNotMatch(css, /#gorunum[^{}]*\{[^}]*(animation:(?!none)|transition:)/);
 });
 
 test('dar ekran: viewport meta, 560 px kuralları, üst şerit sarar (web), yatay kaydırma kaynağı yok', () => {
