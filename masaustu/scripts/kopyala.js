@@ -11,3 +11,9 @@ if (!fs.existsSync(kaynak)) {
 fs.mkdirSync(path.dirname(hedef), { recursive: true });
 fs.copyFileSync(kaynak, hedef);
 console.log('Kopyalandi: ' + kaynak + ' -> ' + hedef);
+// TAA veri alanı kitaplığı kopyası (depo kökündeki taa/): kuyruk.js paketlenmiş uygulamada app/ altından yükler.
+const veriKaynak = path.join(__dirname, '..', '..', 'taa', 'taa-veri.js');
+if (fs.existsSync(veriKaynak)) {
+  fs.copyFileSync(veriKaynak, path.join(path.dirname(hedef), 'taa-veri.js'));
+  console.log('Kopyalandi: ' + veriKaynak);
+}

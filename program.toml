@@ -1,0 +1,12 @@
+# Sahip: Yusuf. yazan: [Claude#taarkod-T2 2026-11-05]
+# TAA program sözleşmesi (kaynak: taa-paket docs/program-sozlesmesi.md). Sürüm masaustu/package.json ile aynıdır.
+ad = "taarkod"
+gorunen_ad = "TaaRkod"
+surum = "1.8.0"
+arayuz = "1"
+gerektirir = {}
+sunar  = ["kod.uret@1"]
+ister  = ["etiket.kuyruga_ekle@1"]
+veri_sahibi = []
+veri_okur   = ["etiket-kuyrugu"]   # yazmaz; değişikliği oneriler/ altına bırakır
+ayar_alani  = "programlar.taarkod"

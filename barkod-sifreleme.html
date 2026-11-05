@@ -749,6 +749,7 @@ html[data-masaustu] .ustGor{min-height:36px}
 <div class="bSag dikisCerceve">
         <button type="button" id="indir" disabled><span id="indirYazi">İndir</span></button>
         <button type="button" id="kopyala" class="ikinci" disabled>Panoya kopyala</button>
+        <button type="button" id="kuyrukGonder" class="ikinci" hidden disabled>Fiyat Etiketi kuyruğuna gönder</button>
         <p class="not" id="kopyalaNot"></p>
         <h3>Önizleme (ilk 8 satır)</h3>
         <pre class="onizPre" id="onizlemePre" tabindex="0" aria-label="Seçili biçimde ilk 8 satırın önizlemesi"></pre>
@@ -5543,6 +5544,7 @@ html[data-masaustu] .ustGor{min-height:36px}
  "Etiket genişliği (nokta, 50-3000; boş = yazıcı varsayılanı)": "Label width (dots, 50-3000; empty = printer default)",
  "Etiket yüksekliği (nokta, 50-3000; boş = yazıcı varsayılanı)": "Label height (dots, 50-3000; empty = printer default)",
  "Panoya kopyala": "Copy to clipboard",
+ "Fiyat Etiketi kuyruğuna gönder": "Send to the Price Label queue",
  "Önizleme (ilk 8 satır)": "Preview (first 8 rows)",
  "Örnek barkod görüntüleri (deneme için)": "Sample barcode images (for testing)",
  "Tümünü yazdır": "Print all",
@@ -6101,6 +6103,9 @@ html[data-masaustu] .ustGor{min-height:36px}
  "ma.son": "Last cleanup: {0}, deleted: {1}.",
  "ma.dogrulamaYok": " The verification file was not found; no cleanup was done.",
  "ma.surumSatir": "{0} (version {1})",
+ "kq.gonderildi": "{0} barcodes were left as a suggestion for the Price Label queue (the queue itself was not changed).",
+ "kq.gonderilemedi": "The suggestion could not be sent; the Price Label queue is not available.",
+ "kq.yok": "Generate a list first; then you can send it to the Price Label queue.",
  "ma.surumYok": "Version information could not be retrieved.",
  "ma.klasorSecildi": "Folder selected.",
  "ma.klasorSecilemedi": "The folder could not be selected.",
@@ -6949,7 +6954,7 @@ html[data-masaustu] .ustGor{min-height:36px}
   var YONTEM_ONERILEN='feistel',YONTEM_VARSAYILAN='harf-karistirma';
   var KOPYA_LIMIT=5000,ONIZ_SATIR=8,SEKME_SIRA=[1,2,3,8,9,10,4,6,5],CEKMECE_SEKME=[10,4,6],ONIZ_GECIKME=150,ONIZ_MAKS=12;
   var onceUzunluk=12,calisiyor=false,iptalIste=false,aktifSekme=1;
-  var uretim=null,ornekler=[],tekSvgMetin=null,tekSayac=null,onizTohum=1,onizZaman=null,onizBasElle=false,kelimeAlan=$('kelime');
+  var uretim=null,kuyrukVar=false,ornekler=[],tekSvgMetin=null,tekSayac=null,onizTohum=1,onizZaman=null,onizBasElle=false,kelimeAlan=$('kelime');
 
   function el(t,m,c){var e=document.createElement(t);if(m!=null)e.textContent=m;if(c)e.className=c;return e}
   function durum(m){var e=$('durum');e.textContent=m;e.title=m}
@@ -8128,6 +8133,7 @@ html[data-masaustu] .ustGor{min-height:36px}
     var biAd=dilYonet.bicim(bi).ad;
     $('indirYazi').textContent=T('d.indir','{0} olarak indir',biAd+(biAd.indexOf('.'+bi.uzanti)<0?' (.'+bi.uzanti+')':''));
     $('indir').disabled=!uretim;
+    $('kuyrukGonder').hidden=!kuyrukVar;$('kuyrukGonder').disabled=!uretim;
     var kn=$('kopyalaNot');
     if(!uretim){$('kopyala').disabled=true;kn.textContent=T('d.onceListe','Önce listeyi üretin; sonra indirebilir ya da panoya kopyalayabilirsiniz.')}
     else if(bi.ikili){$('kopyala').disabled=true;kn.textContent=T('d.ikili','Bu biçim ikili bir dosyadır; panoya kopyalanamaz, lütfen dosya olarak indirin.')}
@@ -8931,6 +8937,20 @@ html[data-masaustu] .ustGor{min-height:36px}
     });
     $('surumOto').addEventListener('change',function(){
       M.otomatikAyarla($('surumOto').checked).catch(function(){durum(T('ma.ayarHata','Ayar kaydedilemedi.'))});
+    });
+  })();
+
+  /* ---------- TAA: Fiyat Etiketi kuyruğu (etiket-kuyrugu alanı, yalnız okur; öneri bırakır, kuyruğa yazmaz) ---------- */
+  (function(){
+    var M=window.barkodMasaustu;
+    if(!M||typeof M.kuyrukDurum!=='function'||!$('kuyrukGonder'))return;
+    M.kuyrukDurum().then(function(r){kuyrukVar=!!(r&&r.var===true);disaDurum()}).catch(function(){kuyrukVar=false;disaDurum()});
+    $('kuyrukGonder').addEventListener('click',function(){
+      if(!uretim){durum(T('kq.yok','Önce bir liste üretin; sonra Fiyat Etiketi kuyruğuna gönderebilirsiniz.'));return}
+      M.kuyrukOner(uretim.m.slice(0,2000)).then(function(r){
+        if(r&&r.tamam)durum(T('kq.gonderildi','{0} barkod Fiyat Etiketi kuyruğu için öneri olarak bırakıldı (kuyruğun kendisi değişmedi).',r.adet));
+        else durum(T('kq.gonderilemedi','Öneri gönderilemedi; Fiyat Etiketi kuyruğu kullanılamıyor.'));
+      }).catch(function(){durum(T('kq.gonderilemedi','Öneri gönderilemedi; Fiyat Etiketi kuyruğu kullanılamıyor.'))});
     });
   })();
 

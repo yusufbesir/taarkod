@@ -92,7 +92,7 @@ test('preload: pencereTema köprüsü dar; yalnız invoke, ham renk geçer, baş
   assert.match(preload, /pencereTema:\s*\(renk,\s*simge\)\s*=>\s*ipcRenderer\.invoke\('pencere:tema',\s*renk,\s*simge\)/);
   assert.strictEqual((preload.match(/exposeInMainWorld\(/g) || []).length, 1);
   const kanallar = [...preload.matchAll(/invoke\('([^']+)'/g)].map((m) => m[1]);
-  assert.deepStrictEqual(kanallar.sort(), ['ayar:otomatik', 'pencere:tema', 'surum:bilgi', 'temizlik:klasorSec', 'temizlik:tara', 'temizlik:uygula']);
+  assert.deepStrictEqual(kanallar.sort(), ['ayar:otomatik', 'pencere:tema', 'surum:bilgi', 'taa:kuyruk-durum', 'taa:kuyruk-oner', 'temizlik:klasorSec', 'temizlik:tara', 'temizlik:uygula']);
 });
 
 test('sayfa köprüyü yalnız varsa çağırır (web sürümü bozulmaz) ve --ust/--ustSimge okur', () => {

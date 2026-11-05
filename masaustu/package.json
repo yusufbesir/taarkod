@@ -37,8 +37,10 @@
       "temizlik.js",
       "ayarkopya.js",
       "pencere.js",
+      "kuyruk.js",
       "preload.js",
       "app/index.html",
+      "app/taa-veri.js",
       "build/icon.png",
       "package.json"
     ],
