@@ -2,7 +2,7 @@
 # TAA program sözleşmesi (kaynak: taa-paket docs/program-sozlesmesi.md). Sürüm masaustu/package.json ile aynıdır.
 ad = "taarkod"
 gorunen_ad = "TaaRkod"
-surum = "1.8.0"
+surum = "1.9.0"
 arayuz = "1"
 gerektirir = {}
 sunar  = ["kod.uret@1"]
