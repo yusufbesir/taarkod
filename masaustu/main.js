@@ -5,6 +5,7 @@ const fs = require('fs');
 const temizlik = require('./temizlik');
 const { eskiAyarlariKopyala } = require('./ayarkopya');
 const cerceve = require('./pencere');
+const kuyruk = require('./kuyruk');
 
 if (!app.requestSingleInstanceLock()) {
   app.quit();
@@ -149,6 +150,20 @@ if (!app.requestSingleInstanceLock()) {
     a.otomatikTemizlik = deger === true;
     ayarYaz(a);
     return { otomatikTemizlik: a.otomatikTemizlik };
+  });
+
+  // ---- TAA veri alanı: etiket-kuyrugu (YALNIZ okur) ----
+  // Alan + SAHIP.toml varsa arayüz "Fiyat Etiketi kuyruğuna gönder" düğmesini gösterir; yoksa gizler (hata yok).
+  // Kuyruk dosyasına yazılmaz; öneri yalnız <alan>/oneriler/ altına bırakılır. Renderer'dan yol alınmaz, yalnız barkod metinleri.
+  ipcMain.handle('taa:kuyruk-durum', (event) => {
+    gonderenKontrol(event);
+    return { var: kuyruk.durum(process.env).var === true };
+  });
+
+  ipcMain.handle('taa:kuyruk-oner', (event, barkodlar) => {
+    gonderenKontrol(event);
+    const r = kuyruk.oner(barkodlar, process.env);
+    return r.tamam ? { tamam: true, adet: r.adet } : { tamam: false, neden: r.neden };
   });
 
   // Tema değişince üst şerit rengiyle sistem düğmelerinin (titleBarOverlay) rengi eşlenir.

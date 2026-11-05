@@ -9,5 +9,8 @@ contextBridge.exposeInMainWorld('barkodMasaustu', {
   uygula: () => ipcRenderer.invoke('temizlik:uygula'),
   otomatikAyarla: (acik) => ipcRenderer.invoke('ayar:otomatik', acik === true),
   // Üst şerit rengi değişince sistem düğmelerinin rengini eşler; doğrulama main.js'te (yalnız #RRGGBB)
-  pencereTema: (renk, simge) => ipcRenderer.invoke('pencere:tema', renk, simge)
+  pencereTema: (renk, simge) => ipcRenderer.invoke('pencere:tema', renk, simge),
+  // TAA etiket-kuyrugu okuru: alan var mı, ve barkodları öneri olarak bırak (kuyruğa yazmaz)
+  kuyrukDurum: () => ipcRenderer.invoke('taa:kuyruk-durum'),
+  kuyrukOner: (barkodlar) => ipcRenderer.invoke('taa:kuyruk-oner', Array.isArray(barkodlar) ? barkodlar : [])
 });
