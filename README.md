@@ -23,3 +23,10 @@ Anahtar kelimeyle geri döndürülebilir barkod seri şifreleme aracı (tek dosy
 - Eski dallar `claude/project-thread-62xflc` (geçiş animasyonu, içeriği main'de var), `claude/tek-cati-t2` ve `claude/surum-1.9.0` (main'e birleşti) artık gereksizdir; silme kararı Yusuf'undur, dallara dokunulmadı.
 - Yarım kalan ve sıradaki işler (TAA paket ana planı §4.3): RK2 barkod nokta ızgarası için tek ortak kural, RK3 ürün ve barkod listesini ortak havuzdan okuma (H5'e bağlı), RK4 yönetici girişi merkezi kimlikten (KM1'e bağlı), RK5 yetenek avı (3 kabul, 6 düzeltmeli), RK6 özgün tema, yükleme ekranı, tanıtım ve taa-kur paketi (A0 ve KU2'ye bağlı).
 - Kapatma anahtarı: Fiyat Etiketi kuyruğu entegrasyonu `etiket-kuyrugu` alanı yoksa kendiliğinden gizlenir; ayrıca program TAA'dan bağımsız tek başına çalışır.
+
+## Kurulum notları (PC denemesi sonrası, 2026-11-15)
+
+- Kurucu yönetici yetkisi İSTEMEZ: kullanıcı başına kurulum (`perMachine:false`, `allowElevation:false`, `customInstallMode`), HKLM kaydı yok. Yönetici penceresi beklenmiyorsa 126 sn'lik takılma yönetici izninden değil, sihirbazın kendisinden gelir: kurucu `oneClick:false` olduğundan klasör seçimi ekranında tıklama bekler, ya da açık bir TAARKOD (taşınabilir sürüm dahil) varsa "kapatıp yeniden dene" penceresinde bekler.
+- Sessiz kurulum: `TAARKOD-Kurulum-<sürüm>.exe /S` (isteğe bağlı `/D=C:\Yol`, tırnaksız ve son parametre). Kurmadan önce çalışan TAARKOD'u kapatın.
+- Windows'ta kurucu bu düzeltmeden sonra yeniden DENENMEDİ; takılma nedeni bulutta doğrulanamadı.
+- Sürüm rozeti: taşınabilir sürümde "v1.8.0" görünmesi, paketin 1.9.0 rozeti düzeltilmeden (PR #4) derlenmiş eski HTML'den gelmesiydi. `npm run kopyala` artık `build.js` ile HTML'i `src/`'den yeniden üretir; eski HTML paketlenemez. Taşınabilir ve kurulum dosyaları yeniden derlenmeli.
