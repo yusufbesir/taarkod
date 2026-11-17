@@ -86,11 +86,19 @@ test('başlık şeridi 1.6: iplik ilerleme göstergesi 10 adımlı, pasif pencer
   assert.ok(/ustIlerleme\(null\)/.test(betik), 'işlem bitince gösterge gizlenir');
 });
 
-test('logo 1.6: işaret 4 kalınlıkta çubuk, sarı anahtar deliği, 6 dikiş; favicon aynı', () => {
+test('logo 2.0 "Saklı Sıra": yedi çubuk, üstten hizalı, uzun/kısa (30/25); yalnız üçüncü çubuk vurgu sınıfı taşır; C2PA üst verisi yok', () => {
   const ust = sablon.slice(sablon.indexOf('<header class="ust">'), sablon.indexOf('</header>'));
-  assert.match(ust, /<svg width="26" height="24" viewBox="84 100 344 306"/);
-  assert.equal((ust.match(/rx="6"\/>/g) || []).length >= 1, true);
-  assert.equal((ust.match(/<rect x="\d+" y="382"/g) || []).length, 6);
+  assert.match(ust, /<svg class="logo" width="30" height="24" viewBox="0 0 37 30" aria-hidden="true" focusable="false">/);
+  const yollar = [...ust.matchAll(/<path( class="vurgu")? d="([^"]+)"\/>/g)];
+  assert.strictEqual(yollar.length, 2);
+  const cubuk = (d) => [...d.matchAll(/M(\d+) 0h(\d+)v(\d+)h-\d+z/g)].map((m) => [+m[1], +m[2], +m[3]]);
+  const hepsi = cubuk(yollar[0][2]).concat(cubuk(yollar[1][2])).sort((a, b) => a[0] - b[0]);
+  assert.deepStrictEqual(hepsi.map((c) => c[1]), [3, 2, 5, 2, 3, 2, 2], 'genişlikler 3·2·5·2·3·2·2');
+  assert.deepStrictEqual(hepsi.map((c) => c[2]), [30, 25, 30, 25, 30, 25, 30], 'uzun/kısa sırası');
+  assert.deepStrictEqual(cubuk(yollar[1][2]), [[11, 5, 30]], 'vurgu yalnız en geniş (üçüncü) çubukta');
+  assert.strictEqual(yollar[1][1], ' class="vurgu"');
+  assert.ok(!/c2pa|<metadata/i.test(sablon), 'satır içi logoda ve faviconda üst veri yok');
+  assert.match(css, /\.ustIc h1 \.logo \.vurgu\{fill:var\(--logoVurgu,var\(--iplik\)\)\}/);
 });
 
 test('sekme ve menü yapısı korunur: dokuz sekme aynı sırada, seçili sekme sarı gösterge', () => {
@@ -129,12 +137,11 @@ test('CSP değişmedi; innerHTML/eval/fetch/ağ yok; harici kaynak yok', () => {
   assert.ok(!/@import|url\(\s*["']?https?:/i.test(sablon));
 });
 
-test('logo: üst şeritte 28 px SVG (anahtar delikli barkod), favicon aynı tasarım, eski şerit-T logosu kalmadı', () => {
-  assert.match(sablon, /<h1><svg width="26" height="24" viewBox="84 100 344 306" aria-hidden="true" focusable="false">/);
+test('logo: favicon kitin piksele oturtulmuş 32 px simgesi (#252B32 zemin, #F5F2EF çubuklar, #E9A4BD anahtar çubuk), eski logo kalmadı', () => {
   const fav = decodeURIComponent(sablon.match(/rel="icon"[^>]*href="data:image\/svg\+xml,([^"]+)"/)[1]);
-  assert.ok(fav.includes('#14513D') && fav.includes('#F4C430') && fav.includes('#F6F1E3'));
-  assert.ok(fav.includes("<circle cx='316' cy='190' r='19'"), 'anahtar deliği');
-  assert.ok(!fav.includes('#1E6B52'), 'eski yeşil kare yok');
+  assert.ok(fav.includes("viewBox='0 0 32 32'") && fav.includes('#252B32') && fav.includes('#F5F2EF') && fav.includes("fill='#E9A4BD' d='M11 6h4v20h-4z'"));
+  assert.ok(!fav.includes('#14513D') && !fav.includes('<circle'), 'eski anahtar delikli logo yok');
+  assert.ok(!/<circle cx="316"|class="logoI"/.test(sablon));
 });
 
 test('barkod etiketi: dikişli iç kenar ve sarı şerit; sonuç mantığı etkilenmez', () => {

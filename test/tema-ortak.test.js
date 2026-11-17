@@ -10,6 +10,7 @@ const kok = path.join(__dirname, '..');
 const T = require('../src/tema.js');
 const U = require('../src/tema_uygulama.js');
 const F = require('./sabit-1.7.1.json');
+const S = require('../src/tasarim.js');
 const sablon = fs.readFileSync(path.join(kok, 'src', 'sablon.html'), 'utf8');
 
 let chromium = null;
@@ -216,8 +217,8 @@ test('belirteç katmanı: planın tüm adları tanımlı, eski adlar kalmadı, b
   // SVG satır içi renk öznitelikleri (logo) belirteçten
   const g = sablon.slice(sablon.indexOf('<body>'), sablon.indexOf('<script>'));
   assert.doesNotMatch(g, /\b(fill|stroke|stop-color|style)="[^"]*(#|rgb)/i, 'gövdede satır içi sabit renk yok');
-  assert.match(g, /class="logoY"/); assert.match(g, /class="logoI"/);
-  assert.match(sablon, /\.logoY\{fill:var\(--ustYazi\)\}\.logoI\{fill:var\(--iplik\)\}/);
+  assert.match(g, /<svg class="logo"/); assert.match(g, /<path class="vurgu"/);
+  assert.match(sablon, /\.ustIc h1 \.logo\{fill:currentColor\}\.ustIc h1 \.logo \.vurgu\{fill:var\(--logoVurgu,var\(--iplik\)\)\}/);
 });
 
 test('güvenlik: CSP aynı, CSS url() yalnız data:, gövdede yalnız logo SVG, innerHTML/eval/fetch yok (görünüm kodu dahil)', () => {
@@ -243,14 +244,18 @@ test('masaüstü köprüsü: palet/kip değişince pencereTemaGonder --ust ve --
 
 /* ---------- tarayıcı testleri ---------- */
 const exeSecenek = () => (fs.existsSync(exe) ? { executablePath: exe } : {});
+// Bu dosyanın testleri Klasik görünümün (tema.js paletleri) davranışını sınar: kayıtlı seçime tasarim:'klasik' eklenir
+// (o.yeni ile varsayılan Mühür açılışı sınanır). Açılış tanıtımı bu sekmede gösterilmiş sayılır.
 async function ac(b, secenek) {
-  const o = secenek || {};
+  const o = Object.assign({}, secenek || {});
+  if (!o.yeni) o.gorunum = Object.assign({ tasarim: 'klasik' }, o.gorunum || {});
   const ctx = await b.newContext({ viewport: { width: o.w || 1000, height: o.h || 900 }, locale: 'tr-TR', colorScheme: o.mod === 'koyu' ? 'dark' : 'light', userAgent: o.masaustu ? 'Mozilla/5.0 Electron/30.0.0 Chrome/124' : undefined });
   const cagrilar = [];
   await ctx.addInitScript((a) => {
     window.__pt = [];
+    try { sessionStorage.setItem('taarkod-acilis', '1'); } catch (e) {}
     if (a.masaustu) window.barkodMasaustu = { surumBilgi: () => Promise.resolve({ surum: '1.8.0', otomatikTemizlik: true, klasor: '', sonTemizlik: null }), pencereTema: (r, s) => { window.__pt.push([r, s]); return Promise.resolve({ tamam: true }); } };
-    if (a.gorunum && !sessionStorage.getItem('__yuklendi')) { sessionStorage.setItem('__yuklendi', '1'); localStorage.setItem('barkod-gorunum', JSON.stringify(a.gorunum)); }
+    if (a.gorunum && !sessionStorage.getItem('__yuklendi') && !localStorage.getItem('barkod-gorunum')) { sessionStorage.setItem('__yuklendi', '1'); localStorage.setItem('barkod-gorunum', JSON.stringify(a.gorunum)); }
   }, { masaustu: !!o.masaustu, gorunum: o.gorunum || null });
   const p = await ctx.newPage(); p.__hatalar = []; p.__cagrilar = cagrilar;
   p.on('pageerror', (e) => p.__hatalar.push(e.message));
@@ -321,7 +326,7 @@ test('tarayıcı: Görünüm penceresi: palet/biçim/kip anında uygulanır, kal
     assert.strictEqual(await kok('ust'), T.uret({ palet: 'bordo', bicim: 'tum', mod: 'koyu' }, U).ust);
     await p.selectOption('#gKose', '8'); await p.selectOption('#gYazi', '115'); await p.selectOption('#gKontrast', 'yuksek');
     const depo = await p.evaluate(() => JSON.parse(localStorage.getItem('barkod-gorunum')));
-    assert.deepStrictEqual(Object.keys(depo).sort(), ['baslik', 'bicim', 'durum', 'iplik', 'kontrast', 'kose', 'ozel', 'palet', 'serit', 'yazi', 'yogunluk']);
+    assert.deepStrictEqual(Object.keys(depo).sort(), ['baslik', 'bicim', 'durum', 'iplik', 'kontrast', 'kose', 'ozel', 'palet', 'serit', 'tasarim', 'vurgu', 'yazi', 'yogunluk']);
     assert.strictEqual(depo.palet, 'bordo'); assert.strictEqual(depo.bicim, 'tum'); assert.strictEqual(depo.kose, 8);
     const ham = await p.evaluate(() => localStorage.getItem('barkod-gorunum'));
     assert.deepStrictEqual(ham.match(/#[0-9A-Fa-f]{6}/g).length, 3, 'yalnız 3 özel renk (hesaplanan değerler kaydedilmez)');
@@ -339,15 +344,17 @@ test('tarayıcı: Görünüm penceresi: palet/biçim/kip anında uygulanır, kal
     assert.strictEqual(await p.evaluate(() => [1, 2, 3].map((i) => 0).length), 3);
     const oz = await p.evaluate(() => ['data-kose', 'data-yazi', 'data-yogun', 'data-serit', 'data-baslik', 'data-durum', 'data-kontrast'].map((a) => document.documentElement.getAttribute(a)));
     assert.deepStrictEqual(oz, ['4', '100', 'rahat', 'dolu', 'serif', 'goster', 'normal']);
-    // Varsayılana dön: Çam + Ton + Sistem
+    // Varsayılana dön: Mühür (tasarımın kendi rengi) + Ton + Sistem
     await p.click('#gSifirla');
-    assert.strictEqual(await p.isChecked('input[name=gPalet][value=cam]'), true);
+    assert.strictEqual(await p.isChecked('input[name=gTasarim][value=muhur]'), true);
+    assert.strictEqual(await p.isChecked('input[name=gPalet][value=tasarim]'), true);
+    assert.strictEqual(await p.evaluate(() => document.documentElement.getAttribute('data-tasarim')), 'muhur');
     assert.strictEqual(await p.isChecked('input[name=gBicim][value=ton]'), true);
     assert.strictEqual(await p.isChecked('input[name=gMod][value=sistem]'), true);
     assert.strictEqual(await p.inputValue('#tema'), 'sistem');
     assert.strictEqual(await p.evaluate(() => document.documentElement.hasAttribute('data-tema')), false);
     await p.emulateMedia({ colorScheme: 'light' });
-    for (const [a, v] of Object.entries(F.acik)) if (a !== 'ustUstu') assert.strictEqual(await kok(a), v, 'varsayılan açık ' + a);
+    for (const [a, v] of Object.entries(S.belirtec('muhur', 'acik').belirtec)) assert.strictEqual(await kok(a), v, 'varsayılan açık (Mühür) ' + a);
     assert.deepStrictEqual(p.__hatalar, []);
   } finally { await b.close(); }
 });
@@ -423,7 +430,7 @@ test('tarayıcı: Özel palet (3 renk) uygulanır, kontrast otomatik düzeltilir
     assert.strictEqual(await p.isChecked('input[name=gMod][value=koyu]'), true);
     assert.strictEqual(await g('ust'), T.uret({ palet: 'ozel', bicim: 'tum', mod: 'koyu', ozel: { ust: '#2255AA', eylem: '#F5E663', iplik: '#FF6600' } }, U).ust);
     // bozuk kayıt süzülür
-    await p.evaluate(() => localStorage.setItem('barkod-gorunum', '{"palet":"<script>","bicim":7,"kose":99,"ozel":{"ust":"red"}}'));
+    await p.evaluate(() => localStorage.setItem('barkod-gorunum', '{"tasarim":"klasik","palet":"<script>","bicim":7,"kose":99,"ozel":{"ust":"red"}}'));
     await p.reload(); await p.waitForTimeout(250);
     assert.strictEqual(await p.evaluate(() => document.documentElement.getAttribute('data-kose')), '4');
     assert.deepStrictEqual(p.__hatalar, []);
@@ -494,7 +501,7 @@ test('tarayıcı: EN dilinde Görünüm penceresi İngilizce (Türkçe harf kalm
     await p.selectOption('#gYogun', 'siki');
     const metin = await p.evaluate(() => document.getElementById('gorunum').innerText + ' ' + document.getElementById('gorunumDugme').textContent);
     assert.doesNotMatch(metin, /[çğıöşüÇĞİÖŞÜ]/, metin.match(/.{0,30}[çğıöşüÇĞİÖŞÜ].{0,30}/) && metin.match(/.{0,30}[çğıöşüÇĞİÖŞÜ].{0,30}/)[0]);
-    assert.match(metin, /APPEARANCE/); assert.match(metin, /Whole interface/); assert.match(metin, /Reset to default/);
+    assert.match(metin, /Appearance/); assert.match(metin, /Whole interface/); assert.match(metin, /Reset to default/);
     // mavi ünlem balonları İngilizce
     const balon = await p.evaluate(() => document.querySelector('[data-ipucu=gTon] .ipucuBalon').textContent);
     assert.match(balon, /^Tint:/);

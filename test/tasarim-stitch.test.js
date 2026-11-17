@@ -31,7 +31,7 @@ test('sürüm rozeti: şablonda tek sabit, package.json sürümüyle birebir eş
 test('başlık şeridi: sürüm rozeti, çevrimdışı durum, Parametreler kısayolu Kurallar sekmesine gider', () => {
   const ust = govde.slice(govde.indexOf('<header class="ust">'), govde.indexOf('</header>'));
   assert.ok(ust.indexOf('</h1>') < ust.indexOf('id="surumRozet"') && ust.indexOf('id="ustIs"') < ust.indexOf('id="ustDurum"'));
-  assert.match(ust, /<button type="button" class="ustParam" data-git="4">PARAMETRELER<\/button>/);
+  assert.match(ust, /<button type="button" class="ustParam" data-git="4">Parametreler<\/button>/);
   assert.match(betik, /T\('ud\.hazir','ÇEVRİMDIŞI · HAZIR'\)/);
   assert.match(betik, /calisiyor\?T\('ud\.calisiyor'/);
   assert.match(betik, /\[data-git\]/);

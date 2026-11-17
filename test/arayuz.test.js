@@ -313,7 +313,7 @@ test('dışa aktar adımı: Liste sekmesi p3 ve p7yi tek akışta gösterir, sek
   assert.deepStrictEqual(adlar, ['Üret', 'Çöz', 'Liste', 'Doğrula', 'Geçmiş', 'Barkod türleri', 'Kurallar', 'Önizleme', 'Yardım']);
   const govde = sablon.slice(sablon.indexOf('<body>'), sablon.indexOf('<script>'));
   assert.strictEqual((govde.match(/<svg/g) || []).length, 1, 'gövdede yalnız üst çubuk logosu SVG olabilir');
-  assert.ok(!/<svg/.test(govde.replace(/<h1><svg[\s\S]*?<\/svg><span>TAARKOD<\/span><\/h1>/, '')), 'menüde ve gövdede (üst çubuk logosu dışında) simge yok');
+  assert.ok(!/<svg/.test(govde.replace(/<h1><svg[\s\S]*?<\/svg><span>TaaRkod<\/span><\/h1>/, '')), 'menüde ve gövdede (üst çubuk logosu dışında) simge yok');
   assert.match(sablon, /\.sekmeIc\{[^}]*flex-wrap:wrap/);
   assert.match(betik, /if\(n===7\)n=3/);
   assert.match(betik, /\$\('p7'\)\.hidden=n!==3/);
@@ -552,9 +552,9 @@ test('etiket görünümü: sarı şerit, Kopyala ve İndir; mavi ton ve gömül�
   assert.match(sablon, /prefers-reduced-motion:reduce/);
 });
 
-test('TAARKOD: başlık, üst çubukta 24px aria-hidden SVG logo + ad, data: URI favicon, eski ad yok', () => {
+test('TAARKOD: başlık, üst çubukta 24px aria-hidden SVG logo + "TaaRkod" yazı markası, data: URI favicon, eski ad yok', () => {
   assert.match(sablon, /<title>TAARKOD<\/title>/);
-  assert.match(sablon, /<h1><svg width="26" height="24"[^>]*aria-hidden="true"[\s\S]*?<\/svg><span>TAARKOD<\/span><\/h1>/);
+  assert.match(sablon, /<h1><svg class="logo" width="30" height="24"[^>]*aria-hidden="true"[\s\S]*?<\/svg><span>TaaRkod<\/span><\/h1>/);
   assert.match(sablon, /<link rel="icon" type="image\/svg\+xml" href="data:image\/svg\+xml,%3Csvg /);
   assert.match(sablon, /img-src data:; font-src data:"/);
   assert.ok(!/Barkod Sıra (Şifreleme|Karıştırma)/.test(sablon), 'eski görünen ad kalmamalı');
