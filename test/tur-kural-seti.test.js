@@ -78,8 +78,21 @@ test('GS1 arayüzü: doğrulama, ZPL/TSPL, kopyala/indir, açık uyarı notu TR+
 
 test('yazı tipi gömme (derlenmiş sayfa): yalnız data: URI, uzak url yok, font-src yalnız data:, CSP geri kalanı aynı', () => {
   const css = cikti.slice(cikti.indexOf('<style>'), cikti.indexOf('</style>'));
-  const bloklar = css.match(/@font-face\{[^}]*\}/g) || [];
-  assert.strictEqual(bloklar.length, 3);
+  const tumBloklar = css.match(/@font-face\{[^}]*\}/g) || [];
+  // ilk üç blok 1.7 yazı tipleridir (tek dosya, geniş aralık); sonrakiler tasarım dillerinin latin + latinext çiftleri
+  const bloklar = tumBloklar.slice(0, 3);
+  const tasarim = [['Manrope', 'manrope'], ['DM Mono', 'dmmono-400'], ['DM Mono', 'dmmono-500'], ['Instrument Sans', 'instrumentsans'], ['Inter', 'inter'],
+    ['JetBrains Mono', 'jetbrainsmono'], ['IBM Plex Sans', 'ibmplexsans'], ['IBM Plex Sans Condensed', 'ibmplexsanscondensed-600'], ['IBM Plex Mono', 'ibmplexmono-400'], ['IBM Plex Mono', 'ibmplexmono-600']];
+  assert.strictEqual(tumBloklar.length, 3 + tasarim.length * 2);
+  tasarim.forEach(([aile, dosya], i) => ['latin', 'latinext'].forEach((alt, j) => {
+    const b = tumBloklar[3 + i * 2 + j];
+    assert.strictEqual(/font-family:"([^"]+)"/.exec(b)[1], aile);
+    const m = /url\(data:font\/woff2;base64,([A-Za-z0-9+/=]+)\)/.exec(b);
+    assert.ok(m && Buffer.from(m[1], 'base64').equals(fs.readFileSync(path.join(kok, 'yazi', dosya + '-' + alt + '.woff2'))), dosya + '-' + alt);
+    assert.match(b, /font-display:swap/);
+    // ı (U+0131) latin dosyasında, ğ Ğ İ ş Ş latinext dosyasında; iki aralık çakışmaz
+    assert.match(b, alt === 'latin' ? /unicode-range:U\+0000-00FF,U\+0131,/ : /unicode-range:U\+0100-0130,U\+0132-0151,U\+0154-017F\}/);
+  }));
   const dosyalar = ['newsreader-600', 'spacemono-400', 'spacemono-700'];
   bloklar.forEach((b, i) => {
     const urls = b.match(/url\(([^)]*)\)/g);
@@ -107,12 +120,13 @@ test('yazı tipi gömme (derlenmiş sayfa): yalnız data: URI, uzak url yok, fon
 test('yazı tipi lisansları: build gömer, textContent ile yazılır, </script oluşmaz', () => {
   const son = cikti.slice(cikti.lastIndexOf('<script>'));
   assert.ok(!/<\/script/i.test(son.slice(0, son.lastIndexOf('</script>'))));
-  ['Newsreader-OFL.txt', 'SpaceMono-OFL.txt'].forEach((f) => {
+  ['Newsreader-OFL.txt', 'SpaceMono-OFL.txt', 'Manrope-OFL.txt', 'DMMono-OFL.txt', 'InstrumentSans-OFL.txt', 'Inter-OFL.txt', 'JetBrainsMono-OFL.txt', 'IBMPlex-OFL.txt'].forEach((f) => {
     const ilk = fs.readFileSync(path.join(kok, 'yazi', f), 'utf8').replace(/\r\n?/g, '\n').trim().split('\n')[0];
     assert.ok(son.includes(JSON.stringify(ilk).slice(1, -1).replace(/</g, '\\u003c')), f);
   });
   assert.match(betik, /e\.textContent=YAZI_LISANS&&/);
   assert.ok(sablon.includes('id="lisNewsreader"') && sablon.includes('id="lisSpaceMono"'));
+  ['lisManrope', 'lisDmMono', 'lisInstrumentSans', 'lisInter', 'lisJetBrainsMono', 'lisIbmPlex'].forEach((i) => assert.ok(sablon.includes('id="' + i + '"'), i));
 });
 
 let chromium = null;

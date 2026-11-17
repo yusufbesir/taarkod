@@ -16,6 +16,10 @@ Anahtar kelimeyle geri döndürülebilir barkod seri şifreleme aracı (tek dosy
 - Denetim (yerelde): `python3 taa/sozlesme_denetle.py --program program.toml --surum-dosyasi masaustu/package.json --paket-kok taa`
 - Yayınlanmamış: TAA tek çatı uyumu (program.toml, etiket-kuyrugu okuru, taa/ kopyaları); sürüm yükseltilmedi.
 
+## Sürüm notu
+
+- 1.10.0: Mühür, Mekik ve İstif tasarım dilleri, Görünüm'de tasarım seçici, gömülü yazı tipleri, yeni Saklı Sıra logosu ve simgeleri, açılış tanıtımı.
+
 ## Durum ve açık işler (kapanış notu, 2026-11-15, RK1)
 
 - Sürüm 1.9.0. Kaynak testleri: 314 test, 312 geçti, 0 kalan, 2 atlandı (`node --test test/*.test.js`). Windows'ta kurulumla `denenmedi` (bu not bulutta yazıldı); Windows denemesi Yusuf'un PC'sinde.
