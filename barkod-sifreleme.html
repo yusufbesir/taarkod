@@ -7477,8 +7477,7 @@ a.addEventListener("animationend",function(e){if(e.target===a)bitir()});setTimeo
     if(o.bicim==='tum')v.bicim='tum';
     Object.keys(GOR_SECENEK).forEach(function(k){if(GOR_SECENEK[k].indexOf(o[k])>=0)v[k]=o[k]});
     if(o.ozel&&typeof o.ozel==='object')['ust','eylem','iplik'].forEach(function(k){if(Tm.gecerliHex(o.ozel[k]))v.ozel[k]=o.ozel[k].toUpperCase()});
-    /* geçiş: tasarım seçimi olmayan eski kayıtta paleti ya da biçimi değiştirmiş kullanıcı alıştığı Klasik görünümde kalır */
-    if(!Object.prototype.hasOwnProperty.call(o,'tasarim')&&(v.palet!==gorVarsayilan().palet||v.bicim==='tum'))v.tasarim='klasik';
+    /* geçiş: tasarım seçimi olmayan eski kayıt da yeni varsayılan tasarıma (Mühür) geçer; Klasik Görünüm'den elle seçilebilir */
     if(!Ts)v.tasarim='klasik';
     return v;
   }

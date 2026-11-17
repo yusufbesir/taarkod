@@ -181,12 +181,11 @@ test('tarayıcı: tasarım seçici klavyeyle (ok tuşları) çalışır, seçim 
   } finally { await b.close(); }
 });
 
-test('tarayıcı: eski kayıt geçişi: paleti değiştirilmiş kayıt Klasik kalır, dokunulmamış kayıt Mühür’e geçer', { skip: atla && 'playwright yok', timeout: 60000 }, async () => {
+test('tarayıcı: eski kayıt geçişi: tasarım seçimi olmayan her eski kayıt Mühür’e geçer', { skip: atla && 'playwright yok', timeout: 60000 }, async () => {
   const b = await chromium.launch(exeSecenek());
   try {
     let p = await ac(b, { gorunum: { palet: 'bordo', bicim: 'ton', kose: 8 } });
-    assert.strictEqual(await p.evaluate(() => document.documentElement.getAttribute('data-tasarim')), 'klasik');
-    assert.strictEqual(await p.evaluate(() => document.documentElement.getAttribute('data-kose')), '8');
+    assert.strictEqual(await p.evaluate(() => document.documentElement.getAttribute('data-tasarim')), 'muhur');
     await p.context().close();
     p = await ac(b, { gorunum: { palet: 'cam', bicim: 'ton', yazi: 115 } });
     assert.strictEqual(await p.evaluate(() => document.documentElement.getAttribute('data-tasarim')), 'muhur');
