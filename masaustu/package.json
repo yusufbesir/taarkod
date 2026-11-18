@@ -33,7 +33,7 @@
       "buildResources": "build"
     },
     "files": [
-      "main.js",
+      "main.js", "hata-bildirimi.js",
       "temizlik.js",
       "ayarkopya.js",
       "pencere.js",

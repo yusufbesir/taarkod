@@ -1,5 +1,7 @@
 'use strict';
 const { app, BrowserWindow, Menu, session, ipcMain, dialog, shell, nativeTheme } = require('electron');
+const HataBildirimi = require('./hata-bildirimi.js'); // TAA ortak hata bildirimi (yerel kuyruk; sunucuya taa-kuyruk gonder yollar)
+HataBildirimi.kur({ program: 'taarkod', surum: app.getVersion(), app });
 const path = require('path');
 const fs = require('fs');
 const temizlik = require('./temizlik');
