@@ -61,9 +61,10 @@ test('preload ayarlı, sandbox hâlâ true', () => {
   assert.match(kaynak, /contextIsolation:\s*true/);
 });
 
-test('preload yalnız barkodMasaustu sunar ve yalnız electron require eder', () => {
-  assert.strictEqual((preloadKaynak.match(/exposeInMainWorld\(/g) || []).length, 1);
+test('preload yalnız barkodMasaustu ve taaGiris (ortak giriş) sunar, yalnız electron require eder', () => {
+  assert.strictEqual((preloadKaynak.match(/exposeInMainWorld\(/g) || []).length, 2);
   assert.match(preloadKaynak, /exposeInMainWorld\('barkodMasaustu'/);
+  assert.match(preloadKaynak, /exposeInMainWorld\('taaGiris'/);
   const gerekenler = preloadKaynak.match(/require\([^)]*\)/g) || [];
   assert.deepStrictEqual(gerekenler, ["require('electron')"]);
   assert.doesNotMatch(preloadKaynak, /ipcRenderer\.(send|on)\b|window\.|process\.|shell|\bfs\b/);

@@ -2,7 +2,7 @@
 const fs = require('fs'), path = require('path');
 const d = __dirname;
 const parcalar = ['core.js', 'yontemler.js', 'barkod.js', 'qr.js', 'datamatrix.js', 'donustur.js', 'kural.js',
-  'depo.js', 'gecmis.js', 'profil.js', 'toplu.js', 'dogrula.js', 'etiket.js', 'tara.js', 'yedek.js', 'gs1.js', 'tema.js', 'tema_uygulama.js', 'tasarim.js', 'dil_en.js', 'dil.js'].map((f) => {
+  'depo.js', 'gecmis.js', 'profil.js', 'toplu.js', 'dogrula.js', 'etiket.js', 'tara.js', 'yedek.js', 'gs1.js', 'tema.js', 'tema_uygulama.js', 'tasarim.js', 'dil_en.js', 'dil.js', 'taa-giris-ekrani.js', 'taa-giris-baslat.js'].map((f) => {
   const s = fs.readFileSync(path.join(d, 'src', f), 'utf8');
   if (/<\/script/i.test(s)) throw new Error(f + ' içinde </script bulundu; satır içi gömülemez.');
   return s;

@@ -90,8 +90,8 @@ test('pencere:tema işleyicisi: gönderen denetimi önce, renk doğrulaması, ma
 
 test('preload: pencereTema köprüsü dar; yalnız invoke, ham renk geçer, başka kanal yok', () => {
   assert.match(preload, /pencereTema:\s*\(renk,\s*simge\)\s*=>\s*ipcRenderer\.invoke\('pencere:tema',\s*renk,\s*simge\)/);
-  assert.strictEqual((preload.match(/exposeInMainWorld\(/g) || []).length, 1);
-  const kanallar = [...preload.matchAll(/invoke\('([^']+)'/g)].map((m) => m[1]);
+  assert.strictEqual((preload.match(/exposeInMainWorld\(/g) || []).length, 2);
+  const kanallar = [...preload.matchAll(/invoke\('([^']+)'/g)].map((m) => m[1]).filter((k) => !k.startsWith('taa-giris:'));
   assert.deepStrictEqual(kanallar.sort(), ['ayar:otomatik', 'pencere:tema', 'surum:bilgi', 'taa:kuyruk-durum', 'taa:kuyruk-oner', 'temizlik:klasorSec', 'temizlik:tara', 'temizlik:uygula']);
 });
 
