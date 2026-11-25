@@ -49,6 +49,12 @@ if (!app.requestSingleInstanceLock()) {
     }
   }
 
+  // TAA ortak giriş (KM1): kimlik ve imzalı istekler taa-kimlik aracında; burada yalnız köprü.
+  require('./taa/taa-giris.js').ipcKur(ipcMain, {
+    program: 'taarkod', paketli: app.isPackaged,
+    denetle: (event) => { gonderenKontrol(event); if (!pencere || event.sender !== pencere.webContents || event.senderFrame !== event.sender.mainFrame) throw new Error('Yetkisiz gönderen'); }
+  });
+
   // Kayıtlı klasörde (renderer'dan yol alınmaz) tarar ve geri dönüşüm kutusuna gönderir.
   // Önce yeni sürümün SHA256'sı (klasörde SHA256.txt varsa) doğrulanır; hatalıysa hiçbir şey silinmez.
   // Silinen her dosyanın adı + SHA256'sı userData/temizlik-log.jsonl dosyasına eklenir. Silme = geri dönüşüm kutusu.
