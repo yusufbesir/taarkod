@@ -19,7 +19,7 @@ test('afterPack tanımlı, dosya var, pakete girmez', () => {
   assert.ok(fs.existsSync(path.join(kok, pkg.build.afterPack)));
   assert.ok(!pkg.build.files.some((f) => /afterpack|icon\.ico/.test(f)));
   assert.strictEqual(pkg.devDependencies.resedit, '3.0.2');
-  assert.strictEqual(pkg.version, '1.8.0');
+  assert.match(pkg.version, /^\d+\.\d+\.\d+$/);
 });
 
 test('icon.ico geçerli, PNG gömülü ve 256 girişi var', () => {

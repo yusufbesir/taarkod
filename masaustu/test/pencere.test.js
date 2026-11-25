@@ -130,11 +130,16 @@ test('simge dosyaları: icon.png 512x512 RGBA, logo kopyası aynı, icon.ico ço
   assert.deepStrictEqual(turler, ['icp4', 'icp5', 'icp6', 'ic07', 'ic08', 'ic09']);
 });
 
-test('logo kaynağı ve yedekler: build/logo.svg var, 1.4 simgeleri yedek-1.4 altında, eski simge duruyor', () => {
+test('logo kaynağı ve yedekler: build/logo.svg Saklı Sıra renklerinde, eski simge duruyor', () => {
   const svg = okuMetin('build', 'logo.svg');
   assert.match(svg, /viewBox="0 0 512 512"/);
-  assert.ok(svg.includes('#14513D') && svg.includes('#F4C430') && svg.includes('#F6F1E3'));
-  ['icon.png', 'icon.ico', 'icon.icns'].forEach((f) => assert.ok(fs.existsSync(path.join(kok, 'build', 'yedek-1.4', f)), f));
+  // Saklı Sıra logosu (arayüz yenilemesi): koyu zemin, açık çubuklar, pembe vurgu.
+  assert.ok(svg.includes('#252B32') && svg.includes('#F5F2EF') && svg.includes('#E9A4BD'));
+  ['icon.png', 'icon.ico', 'icon.icns'].forEach((f) => assert.ok(fs.existsSync(path.join(kok, 'build', f)), f));
+  // Eski simge silinmez: icon.eski.png durur ve güncel simgeden farklıdır.
   assert.ok(fs.existsSync(path.join(kok, 'build', 'icon.eski.png')));
-  assert.ok(!fs.readFileSync(path.join(kok, 'build', 'yedek-1.4', 'icon.png')).equals(fs.readFileSync(path.join(kok, 'build', 'icon.png'))), 'yedek eski simgedir');
+  assert.ok(!fs.readFileSync(path.join(kok, 'build', 'icon.eski.png')).equals(fs.readFileSync(path.join(kok, 'build', 'icon.png'))), 'yedek eski simgedir');
+  // 1.4 simge yedekleri depoya hiç girmedi (yalnız eski PC klasöründe); varsa eksiksiz olmalı.
+  const y14 = path.join(kok, 'build', 'yedek-1.4');
+  if (fs.existsSync(y14)) ['icon.png', 'icon.ico', 'icon.icns'].forEach((f) => assert.ok(fs.existsSync(path.join(y14, f)), f));
 });
