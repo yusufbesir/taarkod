@@ -112,8 +112,11 @@ test('temizlik geri dönüşüm kutusu, açılış kontrolü ve günlük akış�
   assert.match(kaynak, /sonCalisanSurum = simdi/);
 });
 
-test('package.json: sürüm 1.8.0, dosya listesinde temizlik.js ve preload.js, TAARKOD adı, appId aynı', () => {
-  assert.strictEqual(paket.version, '1.8.0');
+test('package.json: sürüm program.toml ile aynı, dosya listesinde temizlik.js ve preload.js, TAARKOD adı, appId aynı', () => {
+  // Sürüm sabit yazılmaz (her sürümde test eskimesin): biçim doğru ve program.toml ile aynı olmalı.
+  assert.match(paket.version, /^\d+\.\d+\.\d+$/);
+  const toml = fs.readFileSync(path.join(__dirname, '..', '..', 'program.toml'), 'utf8');
+  assert.ok(toml.includes('surum = "' + paket.version + '"'), 'program.toml surum ile package.json version aynı olmalı');
   assert.strictEqual(paket.productName, 'TAARKOD');
   assert.strictEqual(paket.build.productName, 'TAARKOD');
   assert.strictEqual(paket.description, 'TAARKOD masaüstü uygulaması');
